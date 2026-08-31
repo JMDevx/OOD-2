@@ -1,24 +1,31 @@
 package speedfast;
 
 /**
- * Pedido de encomienda (documentos o paquetes)
- * Tiempo de entrega: 20 minutos base mas 1.5 minutos por kilometro
+ * Pedido de encomienda (documentos o paquetes).
+ * Tiempo: 20 min + 1.5 min por km, ajustado a entero.
+ * Asignación automática: Daniela Tapia (furgón de encomiendas).
  */
 public class PedidoEncomienda extends Pedido {
 
     /**
-     * Crea un pedido de encomienda.
-     *
-     * @param idPedido    codigo del pedido
+     * @param idPedido    código del pedido
      * @param direccion   dirección de entrega
-     * @param distanciaKm distancia en kilometros
+     * @param distanciaKm distancia en kilómetros
      */
     public PedidoEncomienda(String idPedido, String direccion, int distanciaKm) {
         super(idPedido, direccion, distanciaKm);
     }
 
     /**
-     * Tiempo = 20 min + 1.5 min por kilometro ajustado a entero
+     * Las encomiendas las toma Juan Bonilla.
+     */
+    @Override
+    public void asignarRepartidor() {
+        this.repartidor = "Juan Bonilla";
+    }
+
+    /**
+     * Tiempo = 20 min + 1.5 min por kilómetro, redondeado.
      */
     @Override
     public int calcularTiempoEntrega() {

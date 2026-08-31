@@ -1,62 +1,135 @@
 package speedfast;
 
 /**
- * Clase abstracta que representa un pedido de SpeedFast
- * Reune los atributos y el comportamiento común a todos los tipos de pedido
- * y obliga a cada subclase a definir como se calcula su tiempo de entrega.
+ * Clase abstracta de un pedido SpeedFast.
+ * Atributos y mostrarResumen() comunes. calcularTiempoEntrega() y
+ * asignarRepartidor() los resuelve cada subclase.
  */
 public abstract class Pedido {
 
     /** Código del pedido. */
     protected String idPedido;
 
-    /** Dirección a la que se lleva el pedido. */
+    /** Dirección de entrega. */
     protected String direccionEntrega;
 
-    /** Distancia hasta el punto de entrega en kilometros */
+    /** Distancia en kilómetros. */
     protected int distanciaKm;
 
+    /** Nombre del repartidor asignado, o null si aún no hay. */
+    protected String repartidor;
+
+    /** pendiente, despachado o cancelado */
+    protected String estado;
+
     /**
-     * Crea un pedido con sus datos comunes
+     * Crea un pedido pendiente, sin repartidor.
      *
-     * @param idPedido         codigo del pedido
-     * @param direccionEntrega direccion de entrega
-     * @param distanciaKm      distancia en kilometros
+     * @param idPedido         código del pedido
+     * @param direccionEntrega dirección de entrega
+     * @param distanciaKm      distancia en kilómetros
      */
     public Pedido(String idPedido, String direccionEntrega, int distanciaKm) {
         this.idPedido = idPedido;
         this.direccionEntrega = direccionEntrega;
         this.distanciaKm = distanciaKm;
+        this.estado = "pendiente";
+        this.repartidor = null;
     }
 
     /**
-     * Imprime los datos básicos del pedido
+     * Asignación automática. Cada subclase aplica su propia regla.
      */
-    public void mostrarResumen() {
-        System.out.println(getClass().getSimpleName() + " #" + idPedido);
-        System.out.println("Dirección: " + direccionEntrega);
-        System.out.println("Distancia: " + distanciaKm + " km");
+    public abstract void asignarRepartidor();
+
+    /**
+     * Asignación manual del repartidor por nombre (sobrecarga).
+     *
+     * @param nombre nombre del repartidor
+     */
+    public void asignarRepartidor(String nombre) {
+        this.repartidor = nombre;
     }
 
     /**
-     * Calcula el tiempo estimado de entrega en minutos
-     * Cada subclase aplica su propia formula
+     * Tiempo estimado de entrega en minutos. Cada subclase usa su fórmula.
      *
-     * @return tiempo estimado en minutos
+     * @return minutos
      */
     public abstract int calcularTiempoEntrega();
 
     /**
-     * @return codigo del pedido
+     * Etiqueta de consola: "Pedido Comida", "Pedido Encomienda", "Pedido Express".
      */
+    public String getEtiqueta() {
+        String nombre = getClass().getSimpleName();
+        if ("PedidoComida".equals(nombre)) {
+            return "Pedido Comida";
+        }
+        if ("PedidoEncomienda".equals(nombre)) {
+            return "Pedido Encomienda";
+        }
+        if ("PedidoExpress".equals(nombre)) {
+            return "Pedido Express";
+        }
+        return nombre;
+    }
+
+    /**
+     * Imprime el resumen en el formato del ejemplo de la pauta.
+     */
+    public void mostrarResumen() {
+        System.out.println("[" + getEtiqueta() + "]");
+        System.out.println("Pedido #" + idPedido);
+        System.out.println("Dirección: " + direccionEntrega);
+        System.out.println("Distancia: " + distanciaKm + " km");
+        if (repartidor != null) {
+            System.out.println("Repartidor asignado: " + repartidor);
+        } else {
+            System.out.println("Repartidor asignado: sin asignar");
+        }
+        System.out.println("Tiempo estimado: " + calcularTiempoEntrega() + " minutos");
+    }
+
     public String getIdPedido() {
         return idPedido;
     }
 
-    /**
-     * @return distancia en kilometros
-     */
     public int getDistanciaKm() {
         return distanciaKm;
+    }
+
+    public String getRepartidor() {
+        return repartidor;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    /**
+     * Pasa el pedido a despachado. Lo usa el controlador.
+     *
+     * @return true si se pudo despachar
+     */
+    boolean marcarDespachado() {
+        if (!"pendiente".equals(estado)) {
+            return false;
+        }
+        this.estado = "despachado";
+        return true;
+    }
+
+    /**
+     * Pasa el pedido a cancelado. Lo usa el controlador.
+     *
+     * @return true si se pudo cancelar
+     */
+    boolean marcarCancelado() {
+        if (!"pendiente".equals(estado)) {
+            return false;
+        }
+        this.estado = "cancelado";
+        return true;
     }
 }

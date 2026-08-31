@@ -1,24 +1,35 @@
 package speedfast;
 
 /**
- * Pedido de comida de un restaurante
- * Tiempo de entrega: 15 minutos base mas 2 minutos por cada kilometro
+ * Pedido de comida (restaurante).
+ * Tiempo: 15 min + 2 min por km.
+ * Asignación automática: Luis Díaz si la distancia es 5 km o menos, Pedro Rivas si es mayor.
  */
 public class PedidoComida extends Pedido {
 
     /**
-     * Crea un pedido de comida.
-     *
-     * @param idPedido    codigo del pedido
-     * @param direccion   direccion de entrega
-     * @param distanciaKm distancia en kilometros
+     * @param idPedido    código del pedido
+     * @param direccion   dirección de entrega
+     * @param distanciaKm distancia en kilómetros
      */
     public PedidoComida(String idPedido, String direccion, int distanciaKm) {
         super(idPedido, direccion, distanciaKm);
     }
 
     /**
-     * Tiempo = 15 min + 2 min por cada kilometro
+     * Comida en radio corto: Luis Díaz. Más lejos, Pedro Rivas.
+     */
+    @Override
+    public void asignarRepartidor() {
+        if (distanciaKm <= 5) {
+            this.repartidor = "Luis Díaz";
+        } else {
+            this.repartidor = "Pedro Rivas";
+        }
+    }
+
+    /**
+     * Tiempo = 15 min + 2 min por cada kilómetro.
      */
     @Override
     public int calcularTiempoEntrega() {

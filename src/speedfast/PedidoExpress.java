@@ -1,24 +1,35 @@
 package speedfast;
 
 /**
- * Pedido de compras express (supermercado o farmacia).
- * Tiempo de entrega: 10 minutos base; si supera los 5 kilometros, se suman 5 minutos.
+ * Pedido express (supermercado o farmacia).
+ * Tiempo: 10 min base; +5 min si supera 5 km.
+ * Asignación automática: Carla Núñez si es 5 km o menos, Soto Express si es mayor.
  */
 public class PedidoExpress extends Pedido {
 
     /**
-     * Crea un pedido express
-     *
-     * @param idPedido    codigo del pedido
-     * @param direccion   direccion de entrega
-     * @param distanciaKm distancia en kilometros
+     * @param idPedido    código del pedido
+     * @param direccion   dirección de entrega
+     * @param distanciaKm distancia en kilómetros
      */
     public PedidoExpress(String idPedido, String direccion, int distanciaKm) {
         super(idPedido, direccion, distanciaKm);
     }
 
     /**
-     * Tiempo = 10 min base, si la distancia supera 5 kilometros, se agregan 5 min extra
+     * Express corto: Carla Núñez. Si pasa 5 km, Soto Express.
+     */
+    @Override
+    public void asignarRepartidor() {
+        if (distanciaKm <= 5) {
+            this.repartidor = "Carla Núñez";
+        } else {
+            this.repartidor = "Soto Express";
+        }
+    }
+
+    /**
+     * Tiempo = 10 min base; +5 si la distancia supera 5 kilómetros.
      */
     @Override
     public int calcularTiempoEntrega() {

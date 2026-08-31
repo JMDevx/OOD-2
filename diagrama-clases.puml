@@ -1,0 +1,69 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+interface Despachable {
+  + despachar()
+}
+
+interface Cancelable {
+  + cancelar()
+}
+
+interface Rastreable {
+  + verHistorial()
+}
+
+abstract class Pedido {
+  # idPedido: String
+  # direccionEntrega: String
+  # distanciaKm: int
+  # repartidor: String
+  # estado: String
+  + Pedido(idPedido, direccionEntrega, distanciaKm)
+  + {abstract} asignarRepartidor()
+  + asignarRepartidor(nombre: String)
+  + {abstract} calcularTiempoEntrega(): int
+  + mostrarResumen()
+}
+
+class PedidoComida {
+  + asignarRepartidor()
+  + calcularTiempoEntrega(): int
+}
+
+class PedidoEncomienda {
+  + asignarRepartidor()
+  + calcularTiempoEntrega(): int
+}
+
+class PedidoExpress {
+  + asignarRepartidor()
+  + calcularTiempoEntrega(): int
+}
+
+class ControladorDeEnvios {
+  - pedidoEnCurso: Pedido
+  - historial: ArrayList<Pedido>
+  + seleccionar(pedido: Pedido)
+  + reservar()
+  + despachar()
+  + cancelar()
+  + verHistorial()
+}
+
+class Main {
+  + {static} main(args: String[])
+}
+
+Pedido <|-- PedidoComida
+Pedido <|-- PedidoEncomienda
+Pedido <|-- PedidoExpress
+Despachable <|.. ControladorDeEnvios
+Cancelable <|.. ControladorDeEnvios
+Rastreable <|.. ControladorDeEnvios
+ControladorDeEnvios --> Pedido : pedidoEnCurso
+ControladorDeEnvios --> Pedido : historial
+Main ..> Pedido
+Main ..> ControladorDeEnvios
+
+@enduml

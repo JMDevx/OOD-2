@@ -1,7 +1,9 @@
 ![Duoc UC](https://www.duoc.cl/wp-content/uploads/2022/09/logo-0.png)
 
-# Actividad Formativa – Semana 2
+# Actividad Sumativa – Semana 3
 ## Desarrollo Orientado a Objetos II
+
+**Diseñando un sistema orientado a objetos con clases abstractas, polimorfismo e interfaces**
 
 ---
 
@@ -15,15 +17,15 @@
 
 ## Descripción general del sistema
 
-**SpeedFast** es un prototipo de software orientado a objetos desarrollado en Java para una empresa de reparto a domicilio. En esta segunda semana el proyecto se estructura sobre una **clase abstracta** `Pedido`, que reúne los atributos y el comportamiento común a todos los tipos de pedido y obliga a cada subclase a definir el cálculo de su tiempo de entrega.
+Esta carpeta es la versión integral de **SpeedFast**, el prototipo de reparto a domicilio en Java. Se mantiene la jerarquía de pedidos de comida, encomienda y compras express y se suman asignación de repartidor, interfaces de operación y un controlador de envíos.
 
-Cada tipo de pedido calcula su tiempo estimado de entrega con una lógica propia:
+Cada tipo de pedido sigue calculando su tiempo con la regla de las semanas anteriores:
 
-- **Comida** (restaurantes): 15 min base + 2 min por cada kilómetro.
-- **Encomienda** (documentos o paquetes): 20 min base + 1.5 min por kilómetro (ajustado a entero).
-- **Compras Express** (supermercado o farmacia): 10 min base; si la distancia supera los 5 km, se suman 5 min extra.
+- **Comida:** 15 min base + 2 min por kilómetro.
+- **Encomienda:** 20 min base + 1.5 min por kilómetro (entero).
+- **Express:** 10 min base y 5 min extra si la distancia supera 5 km.
 
-El objetivo de la actividad es aplicar **clases abstractas** y **herencia**, definiendo un método abstracto que se implementa de forma diferenciada en cada subclase.
+La asignación automática también cambia según el tipo. En comida se asigna Luis Díaz o Pedro Rivas según la distancia, encomienda queda con Daniela Tapia y express con Carla Núñez o Soto Express. La sobrecarga `asignarRepartidor(String nombre)` deja un repartidor a mano, como en el ejemplo de consola de la pauta.
 
 ---
 
@@ -31,32 +33,68 @@ El objetivo de la actividad es aplicar **clases abstractas** y **herencia**, def
 
 ### Paquete `speedfast`
 
-- **`Pedido`** *(clase abstracta)*
-  - Atributos comunes: `idPedido`, `direccionEntrega`, `distanciaKm`.
-  - Método implementado `mostrarResumen()`, que imprime los datos básicos del pedido.
-  - Método abstracto `calcularTiempoEntrega()`, implementado por cada subclase.
+- **`Pedido`** *(abstracta)*: atributos comunes, `mostrarResumen()`, `calcularTiempoEntrega()` abstracto, `asignarRepartidor()` abstracto y `asignarRepartidor(String nombre)` sobrecargado.
+- **`PedidoComida`**, **`PedidoEncomienda`**, **`PedidoExpress`**: sobrescriben tiempo y asignación automática.
+- **`Despachable`**, **`Cancelable`**, **`Rastreable`**: `despachar()`, `cancelar()`, `verHistorial()`.
+- **`ControladorDeEnvios`**: implementa las tres interfaces, reserva, despacha, cancela y guarda el historial en un `ArrayList`.
+- **`Main`**: simula asignación automática y manual, tiempos, reserva, despacho, cancelación e historial.
 
-- **`PedidoComida`** *(extiende Pedido)*
-  - Implementa `calcularTiempoEntrega()`: 15 min + 2 min por km.
+### Diagrama de clases
 
-- **`PedidoEncomienda`** *(extiende Pedido)*
-  - Implementa `calcularTiempoEntrega()`: 20 min + 1.5 min por km.
+Archivo `diagrama-clases.puml` (PlantUML). La misma vista en Mermaid:
 
-- **`PedidoExpress`** *(extiende Pedido)*
-  - Implementa `calcularTiempoEntrega()`: 10 min base + 5 min si supera 5 km.
-
-- **`Main`**
-  - Clase de prueba del sistema.
-  - Instancia un objeto de cada subclase y llama a `mostrarResumen()` y `calcularTiempoEntrega()`.
+```mermaid
+classDiagram
+    class Pedido {
+        <<abstract>>
+        #idPedido: String
+        #direccionEntrega: String
+        #distanciaKm: int
+        #repartidor: String
+        #estado: String
+        +asignarRepartidor()*
+        +asignarRepartidor(String)
+        +calcularTiempoEntrega()* int
+        +mostrarResumen()
+    }
+    Pedido <|-- PedidoComida
+    Pedido <|-- PedidoEncomienda
+    Pedido <|-- PedidoExpress
+    class ControladorDeEnvios {
+        +seleccionar(Pedido)
+        +reservar()
+        +despachar()
+        +cancelar()
+        +verHistorial()
+    }
+    Despachable <|.. ControladorDeEnvios
+    Cancelable <|.. ControladorDeEnvios
+    Rastreable <|.. ControladorDeEnvios
+    ControladorDeEnvios --> Pedido
+    class Main {
+        +main(String[])$
+    }
+    Main ..> Pedido
+    Main ..> ControladorDeEnvios
+```
 
 ---
 
 ## Conceptos aplicados
 
-- **Clase abstracta**: `Pedido` no se puede instanciar y define la estructura común.
-- **Método abstracto**: `calcularTiempoEntrega()` obliga a cada subclase a dar su propia implementación.
-- **Herencia y reutilización**: las subclases heredan `mostrarResumen()` de la clase base.
-- **Polimorfismo**: un arreglo de tipo `Pedido` ejecuta el cálculo correcto de cada subclase en tiempo de ejecución.
+- **Clase abstracta:** `Pedido` no se instancia. Deja `mostrarResumen()` listo y obliga a las subclases a definir tiempo y asignación automática.
+- **Sobrescritura:** `asignarRepartidor()` y `calcularTiempoEntrega()` en cada subclase.
+- **Sobrecarga:** `asignarRepartidor()` sin parámetros y `asignarRepartidor(String nombre)` en la clase base.
+- **Polimorfismo:** un `Pedido[]` ejecuta el cálculo y la asignación que corresponde a cada tipo.
+- **Interfaces:** `Despachable`, `Cancelable` y `Rastreable` en `ControladorDeEnvios` para no mezclar esas operaciones con el modelo del pedido.
+
+### Escalabilidad, reutilización y mantenibilidad
+
+La jerarquía deja entrar otro tipo de pedido (por ejemplo un cuarto envío) creando una subclase. No hay que reescribir `Main` ni el controlador para el cálculo de tiempo.
+
+`mostrarResumen()` y la sobrecarga manual se reutilizan en todas las subclases. Las fórmulas de tiempo de las semanas previas se conservan en las mismas clases.
+
+La mantenibilidad mejora porque despachar, cancelar y el historial viven en el controlador. Si cambia la regla de cancelación se toca una clase, no las tres de pedido.
 
 ---
 
@@ -65,15 +103,11 @@ El objetivo de la actividad es aplicar **clases abstractas** y **herencia**, def
 ```bash
 git clone https://github.com/JMDevx/OOD-2.git
 cd OOD-2
-git checkout S2
 ```
 
-1. Abrir el proyecto en **IntelliJ IDEA**.
-2. Verificar que la carpeta `src` esté configurada como *source root* y que el paquete `speedfast` se reconozca correctamente.
-3. Ejecutar la clase `Main.java` del paquete `speedfast`.
-4. Revisar la salida en la consola.
+Abrir en **IntelliJ IDEA** la carpeta `semana 3`. Marcar `src` como *source root* si no queda reconocida. Ejecutar `Main.java` del paquete `speedfast`.
 
-También se puede compilar y ejecutar desde la terminal:
+Desde terminal, dentro de `semana 3`:
 
 ```bash
 javac -encoding UTF-8 -d out src/speedfast/*.java
@@ -86,16 +120,10 @@ java -cp out speedfast.Main
 
 - Java
 - IntelliJ IDEA
-- Programación Orientada a Objetos
-- Clases y métodos abstractos
-- Herencia y polimorfismo
-- Javadoc
-
----
-
-## Fecha de entrega
-
-23/08/2026
+- Clases abstractas
+- Polimorfismo (sobrescritura y sobrecarga)
+- Interfaces
+- ArrayList
 
 ---
 
